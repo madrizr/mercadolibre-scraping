@@ -1,17 +1,21 @@
-# Scraping a Mercadolibre
+# Scraping Mercadolibre
 
-## Cual es su funcion
+## how does it work?
 
-Este es un proceso de extracción de datos del sitio web de MercadoLibre, con el objetivo de identificar el producto más popular basándose en una búsqueda determinada. La búsqueda se realiza utilizando una lista de parámetros específicos. En otras palabras, se está explorando MercadoLibre para encontrar el producto más buscado o vendido, utilizando criterios de búsqueda.
+This is a process of data extraction from the MercadoLibre website, with the aim of identifying the most popular product based on a given search. The search is performed using a list of specific parameters. In other words, MercadoLibre is being explored to find the most searched or sold product, using search criteria.
 
-## Tecnologias
+## Technologies
 
 - Python 3.12.0
 - Pip 23.3.1
 - Scrapy 2.11.0
 
-### Nota
+## Run
 
-Para este proyecto utilice el entorno virtual **Virtualenv**
+`scrapy crawl mercadolibre`
+
+### Note
+
+For this project I used the virtual environment **Virtualenv**
 
 
