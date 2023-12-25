@@ -8,7 +8,8 @@ from scrapy.loader.processors import TakeFirst
 class Book(Item):
     title = scrapy.Field(output_processor=TakeFirst())
     price = scrapy.Field(output_processor=TakeFirst())
-    sold = scrapy.Field(output_processor=TakeFirst())
+    sales = scrapy.Field(output_processor=TakeFirst())
+    approximate_sales = scrapy.Field(output_processor=TakeFirst())
     image = scrapy.Field(output_processor=TakeFirst())
 
 # Definimos la spider de Scrapy.
@@ -48,19 +49,28 @@ class MercadolibreSpider(scrapy.Spider):
     def details(self, response):
         
         # Extrae el precio  exacto del producto.
-        priceInt = response.xpath('//div/div[1]/div[1]/div/div/span/span/span[2]/text()').get()
+        priceInt = (response.xpath('//div/div[1]/div[1]/div/div/span/span/span[2]/text()').get()).replace(".","")
         priceDec = response.xpath('//div/div[1]/div[1]/div/div/span/span/span[4]/text()').get()
-        price = priceInt
+        price = int(priceInt)
+        
+        # Extrae la cantidad de ventas del producto en numero.
+        sales = response.xpath('//div[5]/div/div[1]/div/div[1]/div/div[1]/div/div[1]/span/text()').get()
+        sales_words = sales.split(" ")
+        sale_int = sales_words[4]
+        sales_approx = int(sale_int[1])
+        
         
         if( str(priceDec) != 'None' ):
-            price = str(priceInt) + ',' + str(priceDec)
-        
+            price = float(str(priceInt) + '.' + str(priceDec))
+            
+            
         # Carga los datos en el item.
         item = ItemLoader(Book(), response)
         
         item.add_xpath('title', '//div[2]/div[5]/div/div[1]/div/div[1]/div/div[1]/div/div[2]/h1/text()')
         item.add_value('price', price)
-        item.add_xpath('sold', '//div[5]/div/div[1]/div/div[1]/div/div[1]/div/div[1]/span/text()')
+        item.add_xpath('sales', '//div[5]/div/div[1]/div/div[1]/div/div[1]/div/div[1]/span/text()')
+        item.add_value('approximate_sales', sales_approx) 
         item.add_xpath('image', '//div[1]/div/div/div/div/span/figure/img/@src')
         
         # Devuelve el item.
