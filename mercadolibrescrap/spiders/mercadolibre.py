@@ -1,8 +1,13 @@
 # Primero, importamos los módulos necesarios de Scrapy.
 import scrapy
+import os
 from scrapy.item import Item, Field
 from scrapy.loader import ItemLoader
 from scrapy.loader.processors import TakeFirst
+
+# Elimina el archivo data.json
+if os.path.exists("data.json"):
+    os.remove("data.json")
 
 # Definimos un item de Scrapy para los datos que queremos extraer.
 class Book(Item):
@@ -31,7 +36,7 @@ class MercadolibreSpider(scrapy.Spider):
     def parse(self, response):
         
         # Definimos las palabras clave para las que queremos buscar.
-        keywords = ['perros','libros','loros']
+        keywords = ['libros','cpu','perros','tarjeta','peluches']
         
         # Para cada palabra clave, generamos una URL y hacemos una petición a esa URL.
         for keyword in keywords:
@@ -42,8 +47,13 @@ class MercadolibreSpider(scrapy.Spider):
     # Extrae el enlace de detalle del primer producto y hace una petición a esa URL.
     def listB(self, response):
         linkDetails = response.xpath('//div/div[2]/section/ol/li[1]/div/div/div[2]/div[1]/a/@href').get()
-        yield response.follow(linkDetails, callback=self.details)
-    
+        # Existen dos vistas de los articulos, si no funciona la primera, se prueba la segunda
+        if(linkDetails):
+            yield response.follow(linkDetails, callback=self.details)
+        else:
+            linkDetails = response.xpath('/html/body/main/div/div[2]/section/ol/div[1]/li[1]/div/div/div[2]/div/div[1]/a/@href').get()
+            yield response.follow(linkDetails, callback=self.details)
+            
     # Este método se llama para cada respuesta de las URLs de los detalles del producto.
     # Extrae los datos del producto y los carga en un item.        
     def details(self, response):
@@ -52,12 +62,18 @@ class MercadolibreSpider(scrapy.Spider):
         priceInt = (response.xpath('//div/div[1]/div[1]/div/div/span/span/span[2]/text()').get()).replace(".","")
         priceDec = response.xpath('//div/div[1]/div[1]/div/div/span/span/span[4]/text()').get()
         price = int(priceInt)
+        print(price)
         
         # Extrae la cantidad de ventas del producto en numero.
         sales = response.xpath('//div[5]/div/div[1]/div/div[1]/div/div[1]/div/div[1]/span/text()').get()
         sales_words = sales.split(" ")
         sale_int = sales_words[4]
-        sales_approx = int(sale_int[1])
+        print(sale_int)
+        
+        if (len(sale_int) > 1):
+            sales_approx = int(sale_int[1])
+        else:
+            sales_approx = int(sale_int)    
         
         
         if( str(priceDec) != 'None' ):
