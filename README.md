@@ -11,7 +11,7 @@ As for the api, This Python script sets up an API with FastAPI and Scrapy. When 
 - Python 3.12.0
 - Pip 23.3.1
 
-# Libreries used
+### Libreries used
 - Scrapy 2.11.0
 - FastApi  0.108.0
 - uvicorn 0.25.0
